@@ -1,12 +1,11 @@
-
 from ler_arquivos import get_csv
 import datetime
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv, find_dotenv
-
-df = get_csv()
+from ler_arquivos import convert_csv_ofx
+import pandas as pd
 
 # LLM
 _ = load_dotenv(find_dotenv())
@@ -52,12 +51,17 @@ Responda apenas com a categoria.
 prompt = PromptTemplate.from_template(template=template)
 chat = ChatOpenAI(model="gpt-4o-mini")
 
-category = []
 
-chain = prompt | chat | StrOutputParser()
-category = chain.batch(list(df["Descricao"].values))
-df["Categoria"] = category
-df.to_csv("data_completo.csv")
-df = df[df['Categoria'] != 'Ignoradas'] 
-mes_atual = datetime.datetime.now().strftime("%B")
-df.to_csv(f"data_{mes_atual}.csv", index=False)
+def executar_ia(files):
+  category = []
+  dfs = [convert_csv_ofx(file) for file in files]
+  df = pd.concat(dfs, ignore_index=True)
+  chain = prompt | chat | StrOutputParser()
+  category = chain.batch(list(df["Descricao"].values))
+  df["Categoria"] = category
+  # df.to_csv("data_completo.csv")
+  df = df[df['Categoria'] != 'Ignoradas'] 
+  # mes_atual = datetime.datetime.now().strftime("%B")
+  # df.to_csv(f"data_{mes_atual}.csv", index=False)
+  return df
+    

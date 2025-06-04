@@ -16,3 +16,4 @@ python-dotenv
 ofxparse
 plotly
 streamlit
+hvac

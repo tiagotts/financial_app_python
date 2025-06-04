@@ -24,7 +24,7 @@ if process_files and uploaded_files:
     # df = pd.concat(dfs, ignore_index=True)
 
     df["Mês"] = "Maio"
-    df["Data"] = pd.to_datetime(df["Data"])
+    df["Data"] = pd.to_datetime(df["Data"], dayfirst=True)
     df["Data"] = df["Data"].apply(lambda x: x.date())
     df["Valor"] = np.where(df["Valor"].astype(float) > 0, df["Valor"].astype(float), df["Valor"].astype(float)*-1)
 

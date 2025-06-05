@@ -45,15 +45,14 @@ def get_csv():
     df_ofx = read_ofx_dataframe()
     df_final = pd.concat([df_ofx, df_csv])
     df_final = df_final.reset_index(drop=True)
-    # df_final.to_csv("data_concat.csv", index=False)
-    # df_final.to_excel("./resultado/data_concat.xlsx", index=False)
     return df_final
 
-def convert_csv_ofx(file):
+def convert_csv_ofx(file, mes):
     resultado = pd.DataFrame()
     if file.name.endswith('.csv'):
         resultado = read_csv_dataframe(file)
     elif file.name.endswith('.ofx'):
         resultado = read_ofx_dataframe(file)
-
+    
+    resultado["Mês"] = mes
     return resultado

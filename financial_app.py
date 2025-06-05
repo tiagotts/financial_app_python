@@ -54,12 +54,12 @@ chat = ChatOpenAI(model="gpt-4o-mini")
 
 def executar_ia(files,mes):
   category = []
-  dfs = [convert_csv_ofx(file) for file in files]
+  dfs = [convert_csv_ofx(file, mes) for file in files]
   df = pd.concat(dfs, ignore_index=True)
+  df.to_csv("data_completoTOTAL.csv")
   chain = prompt | chat | StrOutputParser()
   category = chain.batch(list(df["Descricao"].values))
   df["Categoria"] = category
-  # df.to_csv("data_completo.csv")
   df = df[df['Categoria'] != 'Ignoradas'] 
   df.to_csv(f"./arquivos/data_{mes}.csv", index=False)
   return df

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import os
 from financial_app import executar_ia
 
 st.set_page_config(
@@ -9,27 +10,15 @@ st.set_page_config(
     page_icon="📊",
     layout="wide",
 )
-c1, c2 = st.columns([0.6, 0.4])
-st.title("Dashboard de Finanças Pessoais")
 
-with st.sidebar:
-    uploaded_files = st.file_uploader(
-        "Faça upload de um ou mais arquivos CSV ou OFX", 
-        accept_multiple_files=True
-    )
-    process_files = st.button("Enviar arquivos")
-
-if process_files and uploaded_files:
-    df = executar_ia(uploaded_files)
-    # df = pd.concat(dfs, ignore_index=True)
-
-    df["Mês"] = "Maio"
+def montarTela():
+    df["Mês"] = mes
     df["Data"] = pd.to_datetime(df["Data"], dayfirst=True)
     df["Data"] = df["Data"].apply(lambda x: x.date())
     df["Valor"] = np.where(df["Valor"].astype(float) > 0, df["Valor"].astype(float), df["Valor"].astype(float)*-1)
 
     st.sidebar.header("Filtros")
-    mes = st.sidebar.selectbox("Mês", df["Mês"].unique())
+    
     categories = df["Categoria"].unique().tolist()
     selected_categories = st.sidebar.multiselect("Filtrar por Categorias", categories, default=categories)
 
@@ -63,7 +52,47 @@ if process_files and uploaded_files:
     )
     c2.plotly_chart(fig, use_container_width=True, key='pie_chart')
 
+meses = ['Selecione...','Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+c1, c2 = st.columns([0.6, 0.4])
+st.title("Dashboard de Finanças Pessoais")
+
+
+
+with st.sidebar:
+    mes = st.sidebar.selectbox("Mês", meses, key="mes_selecionado")
+    uploaded_files = st.file_uploader(
+        "Faça upload de um ou mais arquivos CSV ou OFX", 
+        accept_multiple_files=True
+    )
+    process_files = st.button("Enviar arquivos")
+
+df = pd.DataFrame()
+
+def selecionar_arquivo_existente():
+    arquivo = st.session_state["arquivo_selecionado"]
+    st.session_state["df"] = pd.read_csv(f'./arquivos/{arquivo}')
+    
+    
+arquivos = sorted(os.listdir('./arquivos')) 
+arquivo_gerado = st.sidebar.selectbox("Arquivos", arquivos, key='arquivo_selecionado', on_change=selecionar_arquivo_existente)
+
+if mes:
+    st.session_state["df"] = pd.read_csv(f'./arquivos/{arquivos[0]}')
+
+if (process_files and uploaded_files and mes):
+    if mes == "Selecione...":
+        st.warning("Por favor, selecione um mês para continuar.")
+    else:
+        df = executar_ia(uploaded_files, mes)
+        montarTela()
+    if "df" in st.session_state: 
+        df = st.session_state["df"] 
+
+
+    
+
 elif not uploaded_files:
     st.info("Por favor, selecione pelo menos um arquivo para enviar.")
 else:
     st.info("Clique em 'Enviar arquivos' para processar os arquivos selecionados.")
+

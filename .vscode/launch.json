@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+    "name": "Streamlit: Run current file",
+    "type": "debugpy",
+    "request": "launch",
+    "program": "${workspaceFolder}/venv/Scripts/streamlit.exe",
+    "console": "integratedTerminal",
+    "justMyCode": true,
+    "args": [
+        "run",
+        "dash.py"
+    ],}
+  ]
+}

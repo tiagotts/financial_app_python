@@ -52,7 +52,7 @@ prompt = PromptTemplate.from_template(template=template)
 chat = ChatOpenAI(model="gpt-4o-mini")
 
 
-def executar_ia(files):
+def executar_ia(files,mes):
   category = []
   dfs = [convert_csv_ofx(file) for file in files]
   df = pd.concat(dfs, ignore_index=True)
@@ -61,7 +61,6 @@ def executar_ia(files):
   df["Categoria"] = category
   # df.to_csv("data_completo.csv")
   df = df[df['Categoria'] != 'Ignoradas'] 
-  # mes_atual = datetime.datetime.now().strftime("%B")
-  # df.to_csv(f"data_{mes_atual}.csv", index=False)
+  df.to_csv(f"./arquivos/data_{mes}.csv", index=False)
   return df
     

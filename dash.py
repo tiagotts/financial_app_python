@@ -76,7 +76,7 @@ def selecionar_arquivo_existente():
 arquivos = sorted(os.listdir('./arquivos')) 
 arquivo_gerado = st.sidebar.selectbox("Arquivos", arquivos, key='arquivo_selecionado', on_change=selecionar_arquivo_existente)
 
-if mes:
+if mes and arquivos.count > 2:
     st.session_state["df"] = pd.read_csv(f'./arquivos/{arquivos[0]}')
 
 if (process_files and uploaded_files and mes):

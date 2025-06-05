@@ -63,4 +63,6 @@ def executar_ia(files,mes):
   df = df[df['Categoria'] != 'Ignoradas'] 
   df.to_csv(f"./arquivos/data_{mes}.csv", index=False)
   return df
+
+
     

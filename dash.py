@@ -59,7 +59,7 @@ st.title("Dashboard de Finanças Pessoais")
 
 
 with st.sidebar:
-    mes = st.sidebar.selectbox("Mês", meses, key="mes_selecionado")
+    mes = st.sidebar.selectbox("Mês de referência para avaliar", meses, key="mes_selecionado", accept_new_options=False)
     uploaded_files = st.file_uploader(
         "Faça upload de um ou mais arquivos CSV ou OFX", 
         accept_multiple_files=True
@@ -73,20 +73,26 @@ def selecionar_arquivo_existente():
     st.session_state["df"] = pd.read_csv(f'./arquivos/{arquivo}')
     
     
-arquivos = sorted(os.listdir('./arquivos')) 
-arquivo_gerado = st.sidebar.selectbox("Arquivos", arquivos, key='arquivo_selecionado', on_change=selecionar_arquivo_existente)
+arquivos_csv = []
+for item in os.listdir('./arquivos'):
+        if item.lower().endswith('.csv'):
+            arquivos_csv.append(item)
 
-if mes and arquivos.count > 2:
-    st.session_state["df"] = pd.read_csv(f'./arquivos/{arquivos[0]}')
+arquivo_gerado = st.sidebar.selectbox("Arquivos", arquivos_csv, key='arquivo_selecionado', on_change=selecionar_arquivo_existente)
+
+if arquivos_csv:
+    df = pd.read_csv(f'./arquivos/{arquivo_gerado}')
+    montarTela()
 
 if (process_files and uploaded_files and mes):
     if mes == "Selecione...":
         st.warning("Por favor, selecione um mês para continuar.")
     else:
-        df = executar_ia(uploaded_files, mes)
+        if "df" in st.session_state: 
+            df = st.session_state["df"] 
+        else:
+            df = executar_ia(uploaded_files, mes)
         montarTela()
-    if "df" in st.session_state: 
-        df = st.session_state["df"] 
 
 
     
